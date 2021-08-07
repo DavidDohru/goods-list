@@ -11,6 +11,13 @@ import {
 import { ListOfGoods } from './Components/ListOfGoods/ListOfGoods';
 import './App.scss';
 import { Switch, Route, Link } from "react-router-dom";
+
+if((JSON.parse(localStorage.getItem('array'))) === null) {
+  localStorage.setItem('array',JSON.stringify([]));
+}
+if(JSON.parse(localStorage.getItem('comments')) === null) {
+  localStorage.setItem('comments',JSON.stringify([]));
+}
 function App() {
   let [listOfUsers,setListOfUsers] = useState((JSON.parse(localStorage.getItem('array'))));
   let [listOfComments,setListOfComments] = useState((JSON.parse(localStorage.getItem('comments'))));
@@ -19,7 +26,6 @@ function App() {
   const [nameForDelete,setNameForDelete] = useState(0);
   const [comment, setComment] = useState('');
   const [badLength, setBadLength] = useState(false);
-  
 
   useEffect(() => 
     setListOfComments(JSON.parse(localStorage.getItem('comments'))),

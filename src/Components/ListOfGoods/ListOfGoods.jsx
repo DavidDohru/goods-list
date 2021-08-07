@@ -29,10 +29,10 @@ export const ListOfGoods = ({list,removeElement,removeComments,setListOfUsers,se
   
   useEffect(() => 
     setListOfUsers((JSON.parse(localStorage.getItem('array'))))
-      ,[idForRemove]);
+   ,[idForRemove]);
    useEffect(()=>
      setListOfComments((JSON.parse(localStorage.getItem('comments'))))
-      ,[listOfComments])
+    ,[listOfComments.length])
 
   return (
   <>
