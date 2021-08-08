@@ -62,7 +62,7 @@ export const ListOfGoods = ({
             className='modal__filter-title'
             type="number"                                               //input for filtering the list by count
             value={searchCount}
-            onChange={({ target }) => setSearchCount(() => +target.value)}
+            onChange={({ target }) => setSearchCount(target.value)}
           />
       </InputGroup>
     </div>
