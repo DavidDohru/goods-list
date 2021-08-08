@@ -1,12 +1,14 @@
-import React,{useState} from 'react';
+import React,{ useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Link } from "react-router-dom";
 import './FormControl.scss';
+import './formControlPropTypes';
 import { 
   Form,
   InputGroup,
   Button,
 } from 'react-bootstrap';
+import { formControlPropTypes } from './formControlPropTypes';
 
 export const FormControl = ({listOfUsers,setNameForDelete,nameForDelete}) => {
   const [cardName , setCardName] = useState('');
@@ -17,7 +19,16 @@ export const FormControl = ({listOfUsers,setNameForDelete,nameForDelete}) => {
   const [widthProduct , setWidthProduct] = useState(0);
   const [heightProduct , setHeightProduct] = useState(0);
   const [badLength , setBadLength] = useState(true);
-  const addAndUpdateNewUser = (name,imageUrl,count,weight,description,width,height,nameForDelete) => {
+  const addAndUpdateNewUser = (
+    name,
+    imageUrl,
+    count,
+    weight,
+    description,
+    width,
+    height,
+    nameForDelete,
+  ) => {
     if (listOfUsers.length) {
       return localStorage.setItem('array',
         JSON.stringify([
@@ -57,19 +68,32 @@ export const FormControl = ({listOfUsers,setNameForDelete,nameForDelete}) => {
     }
   }
 
-
   return(
   <Form className="Form">
     <Form.Control
       value={cardName}
       isInvalid={cardName? false : true}
-      onChange={({target}) => setCardName(target.value)}
+      onChange={({target}) => {
+        setCardName(target.value);
+        if(( imageUrl && target.value && description)) {
+          setBadLength(false);
+        } else {
+          setBadLength(true);
+        }
+      }}
       placeholder="Enter the card name"
     />
     <Form.Control 
       value={imageUrl}
       isInvalid={imageUrl ? false : true}
-      onChange={({target})=> setImageUrl(target.value)}
+      onChange={({target})=> {
+        setImageUrl(target.value)
+        if((cardName && target.value && description)) {
+          setBadLength(false);
+        } else {
+          setBadLength(true);
+        }
+      }}
       placeholder="Enter the imageUrl"
     />
     <InputGroup>
@@ -95,7 +119,7 @@ export const FormControl = ({listOfUsers,setNameForDelete,nameForDelete}) => {
           value={description}
           onChange={({ target }) => {
             setDescription(target.value);
-            if((imageUrl && cardName && target.value).length) {
+            if((imageUrl && cardName && target.value)) {
               setBadLength(false);
             } else {
               setBadLength(true);
@@ -146,8 +170,12 @@ export const FormControl = ({listOfUsers,setNameForDelete,nameForDelete}) => {
             setBadLength(true);
         }}
         >
-          <Button disabled={badLength && true}>Save</Button>
+          <Button
+            style={{display:"block",width:"100%"}} 
+            disabled={badLength && true}>Save</Button>
         </Link>
     </Form>
   );
-}
+};
+FormControl.propTypes = formControlPropTypes;
+

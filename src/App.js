@@ -1,81 +1,50 @@
-import React , {  useState, useEffect, Fragment } from 'react';
+import React , {  useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
-import { FormControl } from './Components/FormControl/FormControl';
-
-import { 
-  Button,
-  Form,
-  CloseButton,
-  Image
-} from 'react-bootstrap';
-import { ListOfGoods } from './Components/ListOfGoods/ListOfGoods';
 import './App.scss';
+import { FormControl } from './Components/FormControl/FormControl';
+import { Button, CloseButton, Image } from 'react-bootstrap';
+import { ListOfGoods } from './Components/ListOfGoods/ListOfGoods.jsx';
 import { Switch, Route, Link } from "react-router-dom";
+import { Comments } from './Components/Comments/Comments';
 
-if((JSON.parse(localStorage.getItem('array'))) === null) {
-  localStorage.setItem('array',JSON.stringify([]));
-}
+if((JSON.parse(localStorage.getItem('array'))) === null) {  // we check whether there are arrays in the                                                      
+  localStorage.setItem('array',JSON.stringify([]));         // cache for user storage
+}                                                           // if not, we create empty ones 
 if(JSON.parse(localStorage.getItem('comments')) === null) {
   localStorage.setItem('comments',JSON.stringify([]));
 }
 function App() {
-  let [listOfUsers,setListOfUsers] = useState((JSON.parse(localStorage.getItem('array'))));
-  let [listOfComments,setListOfComments] = useState((JSON.parse(localStorage.getItem('comments'))));
-  const [idForDelete , setIdForDelete] = useState(0);
+  const [listOfUsers,setListOfUsers] = useState((JSON.parse(localStorage.getItem('array'))));          //create all necessary variables for 
+  const [listOfComments,setListOfComments] = useState((JSON.parse(localStorage.getItem('comments')))); //further creation of objects (user, comment)
+  const [idForDelete , setIdForDelete] = useState(0);                                                  //, and modification of these objects
   const [idRemoveComments,setIdRemoveComments] = useState(0);
   const [nameForDelete,setNameForDelete] = useState(0);
   const [comment, setComment] = useState('');
   const [badLength, setBadLength] = useState(false);
 
   useEffect(() => 
-    setListOfComments(JSON.parse(localStorage.getItem('comments'))),
-    [idRemoveComments,comment.length]);
-
+    setListOfComments(JSON.parse(localStorage.getItem('comments'))),//track changes in the array of comments,
+    [idRemoveComments,comment.length,comment]);                     //delete, and length of the comment
+                                                                    //and in case of change automatically overwrite the object
   const removeElement = (id) => {
     return localStorage.setItem('array', 
-    JSON.stringify(
-      listOfUsers.filter(x => x.id !== id)
+    JSON.stringify(                                                 //Function for deleting card(element) by id click
+      listOfUsers.filter(element => element.id !== id)
     )
   );
   }
-
-  const addNewComments = (comments="",id) => {
-    if(listOfComments.length) {
-      return localStorage.setItem('comments',
-      JSON.stringify([
-        ...listOfComments,
-        {
-          postId: listOfComments.length + 1,
-          productId: id,
-          comments,
-          date: new Date().toLocaleString()
-       }
-  ]));
-    } else {
-      return localStorage.setItem('comments',
-      JSON.stringify([
-        {
-          postId: listOfComments.length + 1,
-          productId: id,
-          comments: comment,
-          date: new Date().toLocaleString()
-       }
-  ]));
-    }
-  }
-
 
 const removeComments = (id,clearPerson) => {
   if (clearPerson) {
     return localStorage.setItem('comments', 
     JSON.stringify(
-      listOfComments.filter(x => x.productId !== clearPerson)
-    )
-  );
+      listOfComments.filter(comment => comment.productId !== clearPerson)   //Function for deleting comment by id click
+    )                                                                       //Also note that if a card has been deleted
+  );                                                                        //, the comments on that card will also be deleted
   }
   return localStorage.setItem('comments', 
     JSON.stringify(
-      listOfComments.filter(x => x.postId !== id)
+      listOfComments.filter(comment => comment.postId !== id)
     )
   );
 }
@@ -84,47 +53,51 @@ const removeComments = (id,clearPerson) => {
   return(
     <div>
    <Switch>
-    <Route path="/" exact>
-        <div>
-        <Link className="form__product_add" to="/modalWindowForm">
-        <Button
-          variant="outline-primary"
+    <Route path="/" exact>                         {/* Here we have indicated  */}
+      <div>                                        {/* on the main page there will */}
+        <Link                                       /* be a button to add new items */
+          className="form__product_add"
+          to="/modalWindowForm"
         >
-          New Product
-        </Button>
-      </Link>
-          <div className="all__card_container">
-            <ListOfGoods
-              setListOfUsers={setListOfUsers}
-              removeElement={removeElement}
-              removeComments={removeComments}
-              listOfComments={listOfComments}
-              setListOfComments={setListOfComments}
-              idForDelete={idForDelete}
-              setIdForDelete={setIdForDelete}
-              list={listOfUsers}
-            />
+          <Button
+            variant="outline-primary"
+          >
+            New Product
+          </Button>
+        </Link>
+        <div className="all__card_container">
+          <ListOfGoods
+            setListOfUsers={setListOfUsers}            /*Here we passed all the necessary variables*/
+            removeElement={removeElement}              /* in order to make a list in a separate component*/
+            removeComments={removeComments}
+            listOfComments={listOfComments}
+            setListOfComments={setListOfComments}
+            idForDelete={idForDelete}
+            setIdForDelete={setIdForDelete}
+            listOfUseres={listOfUsers}
+          />
           </div>
         </div>
       </Route>
-    <Route path="/modalWindowForm">
-    <div className="modal__window-form">
-      <div className="modal__title-container">
-        Add new card
-          <Link
-            to="/"
-            exact
-          >
-            <CloseButton className="card__button-close"/>
-          </Link>
+      <Route path="/modalWindowForm">                           {/*  Here we indicate that the link: */}
+        <div className="modal__window-form">                    {/*  /modalWindowForm should be a form */}
+          <div className="modal__title-container">              {/*  for adding new cards and also the */}
+            Add new card                                        {/* form we made in a separate component */}
+              <Link                                              /* as a separate logic */
+                to="/"
+                exact
+              >
+                <CloseButton className="card__button-close"/>
+              </Link>
+            </div>
+              <FormControl
+                removeComments={removeComments}
+                listOfUsers={listOfUsers}
+                nameForDelete={nameForDelete}                    /*component with forms */
+                setNameForDelete={setNameForDelete}
+              />
         </div>
-          <FormControl
-            listOfUsers={listOfUsers}
-            nameForDelete={nameForDelete}
-            setNameForDelete={setNameForDelete}
-          />
-    </div>
-    </Route>
+      </Route>
     {
       listOfUsers.map(users => (
       <Route
@@ -132,9 +105,9 @@ const removeComments = (id,clearPerson) => {
         path={`/${users.id}`}
         exact
       >
-        <Link  
-          to="/"
-          exact
+        <Link                                     /*  Here we read users, and make for each */
+          to="/"                                  /*  new page in the form of the current link */
+          exact                                   /*  + id of each card by means of library router */
           >
           <Button 
             variant="outline-danger"
@@ -144,8 +117,8 @@ const removeComments = (id,clearPerson) => {
           </Button>
         </Link>
        <Link
-         to={`/${users.id}/edit`}
-       >
+         to={`/${users.id}/edit`}                       /*here with the help of a reac router we add*/
+       >                                                {/*for each card we create an individual editing page*/}
        <Button
           variant="outline-success"
           className="form__product_edit" 
@@ -160,9 +133,9 @@ const removeComments = (id,clearPerson) => {
               <Image
                 rounded
                 className="card__full-img"
-                alt={users.name} 
-                src={users.imageUrl}
-              />
+                alt={users.name}                    //Here is a picture and a  
+                src={users.imageUrl}                //full description of the product
+              />                                 
               <div>
                 Description:
                 <p>{users.description}</p>
@@ -175,56 +148,18 @@ const removeComments = (id,clearPerson) => {
                   }
                 </p>
                 <p>Size - Width: {users.size.width} Heigth: {users.size.height}</p>
-                <ul>{listOfComments
-                .filter(item => item.productId === users.id)
-                  .map((comment,index) => {
-                  if (users.id === comment.productId) {
-                    return(
-                    <Fragment key={comment.id}>
-                      Comment #{index + 1 }<div>By user id : {users.id}</div>
-                      <li className="card__full-list_comments">
-                        <div className="card__full-list_item">{comment.comments}</div>
-                        <CloseButton
-                          onClick={()=> {
-                            removeComments(comment.postId);
-                            setIdRemoveComments(comment.postId);
-                          }}
-                        />
-                      </li>
-                    </Fragment>
-                    )
-                  }
-                })}</ul>
-                <div className="card__full-contol_block">
-                  <Form.Control
-                    isInvalid={(badLength) && true}
-                    isValid={(comment)&& true}
-                    as="textarea" rows={3}
-                    onChange={({target})=> {
-                      setComment(target.value);
-                      if (target.value.length) {
-                        setBadLength(false);
-                      }
-                    }}
-                    value={comment}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Please enter a comment (minimal length = 1).
-                  </Form.Control.Feedback>
-                  <Button
-                    onClick={() => {
-                      if(comment.length >= 1) {
-                        addNewComments(comment, users.id);
-                        setComment('');
-                        setBadLength(false);
-                      } else {
-                        setBadLength(true);
-                        }
-                    }}
-                  >
-                    Add comment
-                  </Button>
-                </div>
+                <Comments
+                  idRemoveComments={idRemoveComments}         //here is a separate Comment component
+                  comment={comment}                           // in which the logic of adding and deleting
+                  removeComments={removeComments}             //comments for each individual user
+                  setIdRemoveComments={setIdRemoveComments}
+                  badLength={badLength}
+                  setComment={setComment}
+                  listOfComments={listOfComments}
+                  setListOfComments={setListOfComments}
+                  setBadLength={setBadLength}
+                  users={users}
+                />
               </div>
             </div>
           </div>
@@ -234,9 +169,9 @@ const removeComments = (id,clearPerson) => {
     {
       listOfUsers.map(users=> (
         <Route
-          key={users.id} 
-          path={`/${users.id}/`}
-        >
+          key={users.id}                          //here is the form for editing the 
+          path={`/${users.id}/`}                  //current item and the back button
+        >                                         {/*in case of editing cancellation*/}
             <div className="modal__window-form">
               <Link
                 to={`/${users.id}`}
