@@ -1,6 +1,6 @@
 # Getting Started with Create React App
 
-[Demo Link]("https://david-dohru.github.io/goods-list");
+[Demo Link](https://david-dohru.github.io/goods-list)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
